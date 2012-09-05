@@ -10,6 +10,7 @@ from django.template import RequestContext
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, Http404
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
+from django.conf import settings
 from iSM.models import Consorcio, Consorcista, Documento
 from iSM.forms import ConsorcioForm, ConsorcistaForm, DocumentUploadForm
 
@@ -72,12 +73,12 @@ def mail_documents(request, consorcista_id):
         except Consorcista.DoesNotExist:
             return Http404
         recipients = [ i[0] for i in consorcio.consorcistas.values_list('email') ]
-#        if documents and recipients:
-#            mail = EmailMessage(subject, message, 'jcrelling@gmail.com', recipients)
-#            for document in documents:
-#                mail.attach(filename=os.path.basename('%s' % document.document_file),
-#                                content=document.document_file.file.read())
-#            mail.send()
+        if documents and recipients:
+            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipients)
+            for document in documents:
+                mail.attach(filename=os.path.basename('%s' % document.document_file),
+                                content=document.document_file.file.read())
+            mail.send()
         return HttpResponseRedirect(reverse('mail-success'))
 
     consorcista = None
