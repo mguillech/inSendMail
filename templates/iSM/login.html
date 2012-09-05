@@ -1,0 +1,26 @@
+{% extends "iSM/base.html" %}
+{% block extra_js %}
+<script type="text/javascript">
+    function testEnter() {
+        if (event.keyCode == 13)
+            $('login_form').submit();
+    }
+</script>
+{% endblock %}
+</head>
+{% block content %}
+		<div class="body login">
+            <form id="login_form" action="{% url login %}" method="POST">
+                {% csrf_token %}
+                <label for="username">Usuario</label>
+                <input type="text" id="username" name="username" onkeypress="testEnter();"/>
+                <br/><br/>
+                <label for="password">Contrase&ntilde;a</label>
+                <input type="password" id="password" name="password" onkeypress="testEnter();"/>
+                <br/><br/>
+                <input type="submit" id="submit" value="Entrar"/>
+            </form>
+            <span class="error">{{ msg }}</span>
+		</div>
+	</div>
+{% endblock %}

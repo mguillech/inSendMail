@@ -1,0 +1,16 @@
+{% extends "iSM/index.html" %}
+{% block content %}
+<div class="section">
+    <h1>{{ consorcista.consorcio }}</h1>
+    <h2>{{ consorcista }}</h2>
+</div>
+<div class="section">
+    <ul id="documents_list">
+        {% for document in documents_list %}
+            <li>{{ document.document_file }}</li>
+        {% empty %}
+            <p> No hay documentos.</p>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

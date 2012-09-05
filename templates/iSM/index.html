@@ -1,0 +1,14 @@
+{% extends "iSM/base.html" %}
+{% block header %}
+    {{ block.super }}
+    <span id="login_info">
+        <p>Hola, {{ user }}</p>
+        <a href="{% url logout %}"><img src='{{ STATIC_URL }}images/door-out-icon.png' /></a>
+    </span>
+    <ul>
+        <li {% ifequal request.path '/' %}class="selected"{% endifequal %}><a href="{% url home %}"><span>Inicio</span></a></li>
+        <li {% ifequal request.path '/upload/' %}class="selected"{% endifequal %}><a href="{% url upload %}"><span>Subir archivo</span></a></li>
+        <li {% ifequal request.path '/about/' %}class="selected"{% endifequal %}><a href="{% url about %}"><span>Nosotros</span></a></li>
+        <li {% ifequal request.path '/contact_us/' %}class="selected"{% endifequal %}><a href="{% url contact-us %}"><span>Cont&aacute;ctenos</span></a></li>
+    </ul>
+{% endblock %}

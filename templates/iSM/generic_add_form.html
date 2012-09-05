@@ -1,0 +1,11 @@
+{% extends 'iSM/index.html' %}
+{% block content %}
+<h1>Agregar {{ tipo }}</h1>
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form.errors }}
+    {{ form.as_p }}
+    <input type="submit" value="Agregar" />
+    <input type="button" onclick="location.href='{% url home %}';" value="Atr&aacute;s" />
+</form>
+{% endblock %}

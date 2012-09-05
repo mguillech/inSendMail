@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>inConsorcio</title>
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" media="all" />
+{% block extra_css %}{% endblock %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.mousewheel-3.0.6.pack.js"></script>
+{% block extra_js %}{% endblock %}
+</head>
+<body>
+	<div id="header">
+	    {% block header %}
+			<div id="logo">
+				<h1>inConsorcio</h1>
+			</div>
+        {% endblock %}
+	</div>
+	<div id="body">
+		{% block content %}{% endblock %}
+	</div>
+	<div id="footer">
+		<div>
+		</div>
+		<div>
+			<p>&copy Copyright 2012. Todos los derechos reservados.</p>
+		</div>
+	</div>
+</body>
+</html>

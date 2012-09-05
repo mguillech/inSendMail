@@ -1,0 +1,24 @@
+{% if consorcista_list %}
+<legend>Seleccione consorcista</legend>
+{% if upload_form %}
+    <br/>
+    <form action="{% url upload %}" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+{% endif %}
+<select class="styled_select" size="1" id="id_consorcista" name="id_consorcista" onchange="popularDocumentos(this.value);">
+{% for consorcista in consorcista_list %}
+    <option value={{ consorcista.id }}>{{ consorcista.name }}</option>
+{% endfor %}
+</select>
+{% else %}
+<p>No hay consorcistas.</p>
+{% endif %}
+
+{% if upload_form %}
+    {{ upload_form.errors }}
+    {{ upload_form.as_p }}
+    <input type="submit" value="Subir archivo" />
+</form>
+{% else %}
+    <br/><a class="add_anchors" href="{% url add-consorcista consorcio_id %}">Agregar consorcista</a><br/>
+{% endif %}

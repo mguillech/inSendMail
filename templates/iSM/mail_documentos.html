@@ -1,0 +1,42 @@
+<style>
+    #mail_documents_list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    #message_label {
+        float: left;
+    }
+</style>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var ul = $('#mail_documents_list');
+        var document_pks = [];
+        parent.$('input[type="checkbox"]:checked').each(function(index) {
+            cloned_li = $(this).parent().clone();
+            cloned_li.find('input').remove();
+            ul.append(cloned_li);
+            document_pks.push(cloned_li.attr('name'));
+        });
+        $('#document_pks').attr("value", document_pks.join(','));
+    });
+</script>
+<h3>Usted est&aacute; a punto de enviar los siguientes documentos:</h3>
+<ul id="mail_documents_list">
+</ul>
+<h3>A los consorcistas en el siguiente consorcio:</h3>
+<p>{{ consorcio }}</p>
+<hr />
+<form action="" method="POST">
+    {% csrf_token %}
+    <input type="hidden" id="document_pks" name="document_pks"/>
+    <label for="subject" id="subject_label">Asunto del correo</label>
+    <input type="text" id="subject" name="subject" />
+    <br/></br>
+    <label for="message" id="message_label">Mensaje en el correo</label>
+    <textarea id="message" name="message"></textarea>
+    <br/><br/>
+    <input type="submit" value="Enviar correo" />
+</form>

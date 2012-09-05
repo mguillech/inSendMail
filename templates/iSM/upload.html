@@ -1,0 +1,33 @@
+{% extends "iSM/index.html" %}
+{% block extra_js %}
+    <script type="text/javascript">
+        function popularConsorcio(consorcio_id) {
+            if (consorcio_id) {
+                $.get("{% url home %}", { consorcio_id: consorcio_id, upload: true },
+                        function(response) {
+                            $('#consorcista_list').html(response);
+                        });
+            }
+        }
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="section">
+        <fieldset>
+            <legend>Seleccione consorcio</legend>
+            {% if consorcio_list %}
+                <select class="styled_select" size="1" name="consorcio" onchange="popularConsorcio(this.value)">
+                    <option></option>
+                    {% for consorcio in consorcio_list %}
+                        <option value={{ consorcio.id }}>{{ consorcio.name }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <p> No hay consorcios. </p>
+            {% endif %}
+            <br/><br/>
+            <div id="consorcista_list">
+            </div>
+        </fieldset>
+    </div>
+{% endblock %}
