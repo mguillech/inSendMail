@@ -12,13 +12,18 @@
 		<div class="body login">
             <form id="login_form" action="{% url login %}" method="POST">
                 {% csrf_token %}
-                <label for="username">Usuario</label>
-                <input type="text" id="username" name="username" onkeypress="testEnter();"/>
-                <br/><br/>
-                <label for="password">Contrase&ntilde;a</label>
-                <input type="password" id="password" name="password" onkeypress="testEnter();"/>
-                <br/><br/>
-                <input type="submit" id="submit" value="Entrar"/>
+                <div class="section" id="login_labels">
+                    <label for="username">Usuario</label>
+                    <br/><br/>
+                    <label for="password">Contrase&ntilde;a</label>
+                </div>
+                <div class="section" id="login_boxes">
+                    <input type="text" id="username" name="username" onkeypress="testEnter();"/>
+                    <br/><br/>
+                    <input type="password" id="password" name="password" onkeypress="testEnter();"/>
+                    <br/><br/>
+                    <input type="submit" id="submit" value="Entrar"/>
+                </div>
             </form>
             <span class="error">{{ msg }}</span>
 		</div>
