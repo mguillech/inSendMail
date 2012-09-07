@@ -14,9 +14,8 @@
     $(document).ready(function() {
         var ul = $('#mail_documents_list');
         var document_pks = [];
-        parent.$('input[type="checkbox"]:checked').each(function(index) {
-            cloned_li = $(this).parent().clone();
-            cloned_li.find('input').remove();
+        parent.$('#documents_list li').each(function(index) {
+            cloned_li = $(this).clone();
             ul.append(cloned_li);
             document_pks.push(cloned_li.attr('name'));
         });
@@ -26,7 +25,7 @@
 <h3>Usted est&aacute; a punto de enviar los siguientes documentos:</h3>
 <ul id="mail_documents_list">
 </ul>
-<h3>A los consorcistas en el siguiente consorcio:</h3>
+<h3>A consorcistas en el siguiente consorcio:</h3>
 <p>{{ consorcio }}</p>
 <hr />
 <form action="" method="POST">

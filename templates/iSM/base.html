@@ -4,9 +4,35 @@
 <meta charset="utf-8" />
 <title>inConsorcio</title>
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" media="all" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui-1.8.23.custom.css" media="all" />
+<style>
+    .ui-datepicker-calendar {
+        display: none;
+    }
+</style>
 {% block extra_css %}{% endblock %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.8.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-1.8.23.custom.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.ui.datepicker-es.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.mousewheel-3.0.6.pack.js"></script>
+<script type="text/javascript">
+    $(function() {
+        $.datepicker.regional = 'es';
+        $('.datefield').datepicker(
+            {
+                changeMonth: true,
+                changeYear: true,
+                showButtonPanel: true,
+                dateFormat: 'mm/yy',
+                onClose: function(dateText, inst) {
+                    var month = $("#ui-datepicker-div .ui-datepicker-month :selected").val();
+                    var year = $("#ui-datepicker-div .ui-datepicker-year :selected").val();
+                    $(this).datepicker('setDate', new Date(year, month, 1));
+                    popularDocumentos();
+                }
+        });
+    });
+</script>
 {% block extra_js %}{% endblock %}
 </head>
 <body>

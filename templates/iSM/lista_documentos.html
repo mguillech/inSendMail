@@ -1,20 +1,21 @@
-<legend>Seleccione los documentos a enviar</legend>
 {% csrf_token %}
 <ul id="documents_list">
 {% for document in documents_list %}
-    <li name="{{ document.pk }}"><input type="checkbox" onclick="checkDocuments();" value="{{ document.pk }}" /><img src='{{ STATIC_URL }}images/pdf-icon.png' /><span>{{ document.document_file|basename }} (subido el {{ document.created|date:"d/m/Y" }} a las {{ document.created|date:"H:m:s" }})</span></li>
+    <li name="{{ document.pk }}"><img src='{{ STATIC_URL }}images/pdf-icon.png' /><span>{{ document.document_file|basename }} (subido el {{ document.created|date:"d/m/Y" }} a las {{ document.created|date:"H:m:s" }} hs)</span></li>
 {% empty %}
-    <p>No hay documentos para enviar.</p>
+    <p>No hay documentos para enviar en este per&iacute;odo.</p>
 {% endfor %}
 </ul>
-<button id="send_email" disabled="disabled">Enviar documentos</button>
+{% if documents_list %}
+<button id="send_email">Enviar documentos</button>
+{% endif %}
 
 <script type="text/javascript">
     $('#send_email').click(function() {
         $.fancybox(
             {
             'type':'iframe',
-            'href':"{% url mail-documents consorcista_id %}",
+            'href':"{% url mail-documents consorcio_id %}",
             'autoDimensions':true,
             'autoScale':true,
             // 'height': 50,

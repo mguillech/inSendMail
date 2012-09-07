@@ -10,34 +10,18 @@
 <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.fancybox-media.js?v=1.0.3"></script>
 
 <script type="text/javascript">
-    function popularConsorcio(consorcio_id) {
-        if (consorcio_id) {
-            $.get("{% url home %}", { consorcio_id: consorcio_id },
-                    function(response) {
-                        $('#consorcista_list').html(response);
-                        first_item = $('#id_consorcista').children()[0];
-                        popularDocumentos(first_item.value);
-                    }
-            );
-        }
-    }
-
-    function popularDocumentos(consorcista_id) {
-        if (consorcista_id) {
-            $.get("{% url get-documents %}", { consorcista_id: consorcista_id },
+    function popularDocumentos() {
+        var consorcio_id = $('#consorcio_list').val();
+        var datepicker_date = $('#date_selection').val();
+        if (consorcio_id && datepicker_date) {
+            $.get("{% url get-documents %}", { consorcio_id: consorcio_id, date: datepicker_date },
                     function(response) {
                         $('#documents').html(response);
                     }
             );
         }
-    }
-
-    function checkDocuments() {
-        var checkboxes = $('input[type="checkbox"]:checked');
-        if (checkboxes.length > 0)
-            $('#send_email').removeAttr('disabled');
         else
-            $('#send_email').attr('disabled', 'disabled');
+            $('#documents').empty();
     }
 </script>
 {% endblock %}
@@ -46,7 +30,7 @@
     <fieldset>
     <legend>Seleccione consorcio</legend>
     {% if consorcio_list %}
-        <select class="styled_select" size="1" name="consorcio" onchange="popularConsorcio(this.value)">
+        <select class="styled_select" size="1" id="consorcio_list" name="consorcio" onchange="popularDocumentos();">
             <option></option>
         {% for consorcio in consorcio_list %}
             <option value={{ consorcio.id }}>{{ consorcio.name }}</option>
@@ -55,10 +39,10 @@
     {% else %}
         <p> No hay consorcios. </p>
     {% endif %}
-    <br/><a class="add_anchors" href="{% url add-consorcio %}">Agregar consorcio</a><br/><br/>
-    <div id="consorcista_list">
-    </div>
-    <br/>
+    <br/><br/>
+    <legend>Seleccione mes/a&ntilde;o</legend>
+    <input id="date_selection" class="datefield" />
+    <br/><br/>
     <div id="documents">
     </div>
     </fieldset>

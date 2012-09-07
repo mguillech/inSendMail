@@ -1,7 +1,9 @@
+# -*- coding: utf-8 -*-
+
 from django.db import models
 
 class Consorcio(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Nombre Consorcio')
+    name = models.CharField(max_length=200, unique=True)
 
     def __unicode__(self):
         return self.name
@@ -9,10 +11,12 @@ class Consorcio(models.Model):
     class Meta:
         ordering = ['name']
 
+
 class Consorcista(models.Model):
-    name = models.CharField(max_length=200, verbose_name='Nombre Consorcista')
-    email = models.EmailField(max_length=200)
-    active = models.BooleanField(default=True, verbose_name='Activo')
+    code = models.IntegerField()
+    name = models.CharField(max_length=200)
+    email = models.EmailField(max_length=200, null=True, blank=True)
+    active = models.BooleanField(default=True)
     consorcio = models.ForeignKey(Consorcio, related_name='consorcistas')
 
     def __unicode__(self):
@@ -21,11 +25,12 @@ class Consorcista(models.Model):
     class Meta:
         ordering = ['name']
 
+
 class Documento(models.Model):
-    consorcista = models.ForeignKey(Consorcista, related_name="document", null=True, blank=True)
-    document_file = models.FileField(upload_to='documents/%Y/%m/%d/%H/%M/%S/', max_length=255,
-        verbose_name='Archivo de documento')
+    consorcio = models.ForeignKey(Consorcio, related_name="document", null=True, blank=True)
+    document_file = models.FileField(upload_to='documents/%Y/%m/%d/%H/%M/%S/', max_length=255)
+    belongs_to = models.DateField()
     created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return u'%s -- %s' % (self.consorcista, self.document_file)
+        return u'%s -- %s' % (self.consorcio, self.document_file)

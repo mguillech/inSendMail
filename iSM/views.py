@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import os
+import re
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import (login as login_function,
@@ -16,21 +17,6 @@ from iSM.forms import ConsorcioForm, ConsorcistaForm, DocumentUploadForm
 
 @login_required
 def home(request):
-    if request.is_ajax():
-        if request.method == 'GET':
-            consorcio_id = request.GET.get('consorcio_id')
-            upload = request.GET.get('upload')
-            document_form = None
-            if upload:
-                document_form = DocumentUploadForm()
-            if consorcio_id:
-                consorcista_list = Consorcista.objects.filter(consorcio=consorcio_id, active=True)
-                return render_to_response('iSM/lista_consorcistas.html', {'consorcista_list': consorcista_list,
-                                                                          'consorcio_id': consorcio_id,
-                                                                          'upload_form': document_form},
-                                                                         context_instance=RequestContext(request))
-        else:
-            return HttpResponseBadRequest()
     consorcio_list = Consorcio.objects.all()
     return render_to_response('iSM/send.html', {'consorcio_list': consorcio_list},
         context_instance=RequestContext(request))
@@ -60,7 +46,8 @@ def logout(request):
         return HttpResponseRedirect(reverse('login'))
 
 @login_required
-def mail_documents(request, consorcista_id):
+def mail_documents(request, consorcio_id):
+    consorcio = get_object_or_404(Consorcio, pk=consorcio_id)
     if request.method == 'POST':
         documents = None
         subject = request.POST.get('subject')
@@ -68,24 +55,19 @@ def mail_documents(request, consorcista_id):
         documents_pks = request.POST.get('document_pks')
         if documents_pks:
             documents = Documento.objects.filter(pk__in=documents_pks.split(','))
-        try:
-            consorcio = Consorcista.objects.get(pk=consorcista_id).consorcio
-        except Consorcista.DoesNotExist:
-            return Http404
-        recipients = [ i[0] for i in consorcio.consorcistas.values_list('email') ]
-        if documents and recipients:
-            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipients)
-            for document in documents:
-                mail.attach(filename=os.path.basename('%s' % document.document_file),
-                                content=document.document_file.file.read())
+        for document in documents:
+            document_name = os.path.basename(document.name)
+            document_name_split = document_name.split('_')
+            try:
+                recipient = Consorcista.objects.get(code=document_name_split[0]).email
+            except Consorcista.DoesNotExist:
+                continue
+            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipient)
+            mail.attach(filename=document_name, content=document.document_file.file.read())
             mail.send()
         return HttpResponseRedirect(reverse('mail-success'))
 
-    consorcista = None
-    if consorcista_id:
-        consorcista = get_object_or_404(Consorcista, pk=consorcista_id)
-        consorcio = consorcista.consorcio
-    return render_to_response('iSM/mail_documentos.html', {'consorcista': consorcista, 'consorcio': consorcio},
+    return render_to_response('iSM/mail_documentos.html', {'consorcio': consorcio},
         context_instance=RequestContext(request))
 
 @login_required
@@ -93,12 +75,11 @@ def upload(request):
     if request.method == 'POST':
         document_form = DocumentUploadForm(request.POST, request.FILES)
         if document_form.is_valid():
-            document = document_form.save(commit=False)
-            document.consorcista = Consorcista.objects.get(pk=request.POST['id_consorcista'])
-            document.save()
+            _ = document_form.save()
             return HttpResponseRedirect(reverse('upload'))
-    consorcio_list = Consorcio.objects.all()
-    return render_to_response('iSM/upload.html', {'consorcio_list': consorcio_list},
+    else:
+        document_form = DocumentUploadForm()
+    return render_to_response('iSM/upload.html', {'upload_form': document_form},
         context_instance=RequestContext(request))
 
 @login_required
@@ -122,34 +103,67 @@ def add_consorcio(request):
         context_instance=RequestContext(request))
 
 @login_required
-def delete_consorcio(request):
-    pass
+def edit_consorcio(request, consorcio_id):
+    consorcio = get_object_or_404(Consorcio, pk=consorcio_id)
+    if request.method == 'POST':
+        consorcio_form = ConsorcioForm(request.POST, instance=consorcio)
+        if consorcio_form.is_valid():
+            consorcio_form.save()
+            return HttpResponseRedirect(reverse('list-consorcios'))
+    else:
+        consorcio_form = ConsorcioForm(instance=consorcio)
+    return render_to_response('iSM/generic_edit_form.html', {'form': consorcio_form, 'tipo': 'Consorcio'},
+        context_instance=RequestContext(request))
 
 @login_required
-def add_consorcista(request, consorcio_id):
+def delete_consorcio(request, consorcio_id):
+    consorcio = get_object_or_404(Consorcio, pk=consorcio_id)
+    consorcio.delete()
+    return HttpResponseRedirect(reverse('list-consorcio'))
+
+@login_required
+def add_consorcista(request):
     if request.method == 'POST':
         consorcista_form = ConsorcistaForm(request.POST)
         if consorcista_form.is_valid():
             consorcista_form.save()
             return HttpResponseRedirect(reverse('home'))
 
-    consorcista_form = ConsorcistaForm(initial={'consorcio': consorcio_id})
+    consorcista_form = ConsorcistaForm()
     return render_to_response('iSM/generic_add_form.html', {'form': consorcista_form, 'tipo': 'Consorcista'},
         context_instance=RequestContext(request))
 
 @login_required
-def delete_consorcista(request):
-    pass
+def edit_consorcista(request, consorcista_id):
+    consorcista = get_object_or_404(Consorcista, pk=consorcista_id)
+    if request.method == 'POST':
+        consorcista_form = ConsorcistaForm(request.POST, instance=consorcista)
+        if consorcista_form.is_valid():
+            consorcista_form.save()
+            return HttpResponseRedirect(reverse('list-consorcistas'))
+
+    consorcista_form = ConsorcistaForm(instance=consorcista)
+    return render_to_response('iSM/generic_edit_form.html', {'form': consorcista_form, 'tipo': 'Consorcista'},
+        context_instance=RequestContext(request))
+
+@login_required
+def delete_consorcista(request, consorcista_id):
+    consorcista = get_object_or_404(Consorcista, pk=consorcista_id)
+    consorcista.delete()
+    return HttpResponseRedirect(reverse('list-consorcistas'))
 
 @login_required
 def get_documents(request):
     if request.is_ajax():
         if request.method == 'GET':
-            consorcista_id = request.GET.get('consorcista_id')
-            if consorcista_id:
-                documents_list = Documento.objects.filter(consorcista=consorcista_id)
+            consorcio_id = request.GET.get('consorcio_id')
+            date = request.GET.get('date')
+            if not re.match(r'(\d+){2}\/(\d+){4}', date):
+                return HttpResponseBadRequest
+            date_split = date.split('/')
+            date = '%s-%s-01' % (date_split[1], date_split[0])
+            if consorcio_id:
+                documents_list = Documento.objects.filter(consorcio=consorcio_id, belongs_to=date)
                 return render_to_response('iSM/lista_documentos.html', {'documents_list': documents_list,
-                                                                        'consorcista_id': consorcista_id},
+                                                                        'consorcio_id': consorcio_id},
                     context_instance=RequestContext(request))
-    else:
-        return HttpResponseBadRequest()

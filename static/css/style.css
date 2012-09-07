@@ -79,7 +79,7 @@ body {
 
 #body {
 	margin: 0;
-	padding: 10px;
+	padding-left: 10px;
 	min-width: 960px;
 }
 
@@ -557,15 +557,15 @@ body {
 #body .blog div p {
 	padding: 15px 0;	
 }
-#body .blog div p.article {
-	font-weight: bold;	
-}
+
 #footer {
 	background: #f5f5f5 url(/static/images/bg-footer.gif) repeat-x top left;
 	margin: 0;
-	min-width: 960px;
+	width:100%;
 	padding: 0;
+    min-width: 960px;
 }
+
 #footer div {
 	margin: 0 auto;
 	overflow: hidden;
@@ -671,12 +671,62 @@ body {
     height: 34px;
 }
 
-.add_anchors {
+.add_anchor {
     font-size: 12px;
 }
 
-#documents_list {
+#documents_list, #mail_documents_list {
     list-style: none;
     margin-top: 10px;
     padding: 0;
+}
+
+table {
+    border-color: gray;
+    width: 100%;
+    border-spacing: 0;
+    font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+    font-size: 14px;
+    background: white;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+thead, tbody {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    font-size: 100%;
+    vertical-align: baseline;
+    background: transparent;
+}
+
+thead {
+    display: table-header-group;
+    vertical-align: middle;
+    border-color: inherit;
+}
+
+th {
+    font-size: 14px;
+    font-weight: normal;
+    color: #039;
+    border-bottom: 2px solid #6678B1;
+    padding: 10px 8px;
+}
+
+tr {
+    display: table-row;
+}
+
+td {
+    border-bottom: 1px solid #CCC;
+    color: #2A4F5E;
+    padding: 6px 8px;
+    vertical-align: top;
+}
+
+.table_consorcio {
+    width: 50%;
 }

@@ -7,6 +7,8 @@
     </span>
     <ul>
         <li {% ifequal request.path '/' %}class="selected"{% endifequal %}><a href="{% url home %}"><span>Inicio</span></a></li>
+        <li {% ifequal request.path '/consorcio/' %}class="selected"{% endifequal %}><a href="{% url list-consorcios %}"><span>Consorcios</span></a></li>
+        <li {% ifequal request.path '/consorcio/consorcista/' %}class="selected"{% endifequal %}><a href="{% url list-consorcistas %}"><span>Consorcistas</span></a></li>
         <li {% ifequal request.path '/upload/' %}class="selected"{% endifequal %}><a href="{% url upload %}"><span>Subir archivo</span></a></li>
         <li {% ifequal request.path '/about/' %}class="selected"{% endifequal %}><a href="{% url about %}"><span>Nosotros</span></a></li>
         <li {% ifequal request.path '/contact_us/' %}class="selected"{% endifequal %}><a href="{% url contact-us %}"><span>Cont&aacute;ctenos</span></a></li>

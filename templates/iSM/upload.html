@@ -1,33 +1,38 @@
 {% extends "iSM/index.html" %}
 {% block extra_js %}
-    <script type="text/javascript">
-        function popularConsorcio(consorcio_id) {
-            if (consorcio_id) {
-                $.get("{% url home %}", { consorcio_id: consorcio_id, upload: true },
-                        function(response) {
-                            $('#consorcista_list').html(response);
-                        });
-            }
+<script type="text/javascript">
+    function checkForm() {
+        var consorcio_field = $('#id_consorcio');
+        var re_upload = /\d+_.+.pdf/;
+        var re_belongs_to = /(\d+){2}\/(\d+){4}/;
+        var file_field = $('#id_document_file');
+        var belongs_to_field = $('#id_belongs_to');
+        if (consorcio_field.val() == '') {
+            alert("Por favor seleccione un consorcio en la lista");
+            return false;
         }
-    </script>
+        if (!re_upload.test(file_field.val().split('\\')[2])) {
+            alert("Por favor seleccione un archivo de consorcio válido");
+            return false;
+        }
+        if (!re_belongs_to.test(belongs_to_field.val())) {
+            alert('Por favor seleccione un mes/año válido');
+            return false;
+        }
+        return true;
+    }
+</script>
 {% endblock %}
 {% block content %}
     <div class="section">
-        <fieldset>
-            <legend>Seleccione consorcio</legend>
-            {% if consorcio_list %}
-                <select class="styled_select" size="1" name="consorcio" onchange="popularConsorcio(this.value)">
-                    <option></option>
-                    {% for consorcio in consorcio_list %}
-                        <option value={{ consorcio.id }}>{{ consorcio.name }}</option>
-                    {% endfor %}
-                </select>
-            {% else %}
-                <p> No hay consorcios. </p>
-            {% endif %}
-            <br/><br/>
-            <div id="consorcista_list">
-            </div>
-        </fieldset>
+        <form id="upload_form" action="{% url upload %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <fieldset>
+                <legend>Seleccione consorcio</legend>
+                {{ upload_form.errors }}
+                {{ upload_form.as_p }}
+                <input type="submit" value="Subir archivo" onclick="return checkForm();"/>
+            </fieldset>
+        </form>
     </div>
 {% endblock %}

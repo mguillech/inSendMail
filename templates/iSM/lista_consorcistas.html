@@ -1,24 +1,29 @@
-{% if consorcista_list %}
-<legend>Seleccione consorcista</legend>
-{% if upload_form %}
-    <br/>
-    <form action="{% url upload %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-{% endif %}
-<select class="styled_select" size="1" id="id_consorcista" name="id_consorcista" onchange="popularDocumentos(this.value);">
-{% for consorcista in consorcista_list %}
-    <option value={{ consorcista.id }}>{{ consorcista.name }}</option>
-{% endfor %}
-</select>
-{% else %}
-<p>No hay consorcistas.</p>
-{% endif %}
-
-{% if upload_form %}
-    {{ upload_form.errors }}
-    {{ upload_form.as_p }}
-    <input type="submit" value="Subir archivo" />
-</form>
-{% else %}
-    <br/><a class="add_anchors" href="{% url add-consorcista consorcio_id %}">Agregar consorcista</a><br/>
-{% endif %}
+{% extends "iSM/index.html" %}
+{% block content %}
+    <a href="{% url add-consorcista %}"><img src="{{ STATIC_URL }}images/add-icon.png" /><span>Agregar consorcista</span></a>
+<table id="consorcistas" cellspacing="10">
+    <thead>
+        <tr>
+            <th scope="col">C&oacute;digo</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">E-mail</th>
+            <th scope="col">Consorcio</th>
+            <th scope="col" colspan="2">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for consorcista in consorcistas %}
+        <tr>
+            <td>{{ consorcista.code }}</td>
+            <td>{{ consorcista }}</td>
+            <td>{{ consorcista.email }}</td>
+            <td>{{ consorcista.consorcio }}</td>
+            <td><a href="{% url edit-consorcista consorcista.pk %}"><img src="{{ STATIC_URL }}images/edit-icon.png" /></a></td>
+            <td><a href="{% url delete-consorcista consorcista.pk %}" onclick="return confirm('Est&aacute; seguro de eliminar este consorcista?');"><img src="{{ STATIC_URL }}images/delete-icon.png" /></a></td>
+        </tr>
+    {% empty %}
+        <p>No hay consorcistas</p>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
