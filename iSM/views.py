@@ -13,7 +13,7 @@ from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from iSM.models import Consorcio, Consorcista, Documento
-from iSM.forms import ConsorcioForm, ConsorcistaForm, DocumentUploadForm
+from iSM.forms import ConsorcioForm, ConsorcistaForm, DocumentUploadForm, ContactUs
 
 @login_required
 def home(request):
@@ -88,7 +88,19 @@ def about(request):
 
 @login_required
 def contact_us(request):
-    return render_to_response('iSM/contact_us.html', context_instance=RequestContext(request))
+    if request.method == 'POST':
+        contact_us_form = ContactUs(request.POST)
+        if contact_us_form.is_valid():
+            name = contact_us_form.cleaned_data['name']
+            email = contact_us_form.cleaned_data['email']
+            message = contact_us_form.cleaned_data['message']
+            subject = u'Mail enviado desde la web por %s (%s)' % (name, email)
+    #        mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, settings.EMAIL_HOST_USER)
+    #        mail.send()
+    else:
+        contact_us_form = ContactUs()
+    return render_to_response('iSM/contact_us.html', {'form': contact_us_form},
+                                                      context_instance=RequestContext(request))
 
 @login_required
 def add_consorcio(request):

@@ -48,3 +48,9 @@ class DocumentUploadForm(forms.ModelForm):
 
     class Meta:
         model = Documento
+
+
+class ContactUs(forms.Form):
+    name = forms.CharField(label='Su nombre:')
+    email = forms.EmailField(label=u'Su dirección de e-mail:')
+    message = forms.CharField(widget=forms.Textarea, label='Mensaje:')

@@ -730,3 +730,7 @@ td {
 .table_consorcio {
     width: 50%;
 }
+
+.errorlist {
+    color:red;
+}
