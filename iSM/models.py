@@ -4,6 +4,7 @@ from django.db import models
 
 class Consorcio(models.Model):
     name = models.CharField(max_length=200, unique=True)
+    created = models.DateField(auto_now_add=True)
 
     def __unicode__(self):
         return self.name
@@ -13,11 +14,11 @@ class Consorcio(models.Model):
 
 
 class Consorcista(models.Model):
-    code = models.IntegerField()
+    unidad = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
-    email = models.EmailField(max_length=200, null=True, blank=True)
-    active = models.BooleanField(default=True)
+    emails = models.CharField(max_length=200)
     consorcio = models.ForeignKey(Consorcio, related_name='consorcistas')
+    created = models.DateField(auto_now_add=True)
 
     def __unicode__(self):
         return self.name
@@ -27,10 +28,11 @@ class Consorcista(models.Model):
 
 
 class Documento(models.Model):
-    consorcio = models.ForeignKey(Consorcio, related_name="document", null=True, blank=True)
+    consorcista = models.ForeignKey(Consorcista, related_name="documentos", null=True, blank=True)
+    document_name = models.CharField(max_length=255, null=True, blank=True)
     document_file = models.FileField(upload_to='documents/%Y/%m/%d/%H/%M/%S/', max_length=255)
-    belongs_to = models.DateField()
+    belongs_to = models.DateField(null=True, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
     def __unicode__(self):
-        return u'%s -- %s' % (self.consorcio, self.document_file)
+        return u'%s' % self.document_name

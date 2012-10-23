@@ -15,10 +15,14 @@ from django.conf import settings
 from iSM.models import Consorcio, Consorcista, Documento
 from iSM.forms import ConsorcioForm, ConsorcistaForm, DocumentUploadForm, ContactUs
 
+from iSM.functions import process_document
+
 @login_required
 def home(request):
     consorcio_list = Consorcio.objects.all()
-    return render_to_response('iSM/send.html', {'consorcio_list': consorcio_list},
+    consorcista_list = Consorcista.objects.all()
+    return render_to_response('iSM/send.html', {'consorcio_list': consorcio_list,
+                                                'consorcista_list': consorcista_list},
         context_instance=RequestContext(request))
 
 def login(request):
@@ -46,37 +50,41 @@ def logout(request):
         return HttpResponseRedirect(reverse('login'))
 
 @login_required
-def mail_documents(request, consorcio_id):
-    consorcio = get_object_or_404(Consorcio, pk=consorcio_id)
+def mail_documents(request):
     if request.method == 'POST':
-        documents = None
         subject = request.POST.get('subject')
-        message = request.POST.get('message')
+        message = request.POST.get('message_area')
         documents_pks = request.POST.get('document_pks')
-        if documents_pks:
-            documents = Documento.objects.filter(pk__in=documents_pks.split(','))
+        if not all([subject, message, documents_pks]):
+            return HttpResponseRedirect(reverse('mail-failed'))
+        documents = Documento.objects.filter(pk__in=documents_pks.split(','))
         for document in documents:
-            document_name = os.path.basename(document.name)
-            document_name_split = document_name.split('_')
-            try:
-                recipient = Consorcista.objects.get(code=document_name_split[0]).email
-            except Consorcista.DoesNotExist:
-                continue
-            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipient)
-            mail.attach(filename=document_name, content=document.document_file.file.read())
-            mail.send()
+            document_name = document.document_name
+            recipients = [ i.strip() for i in document.consorcista.emails.split('/') ]
+            for recipient in recipients:
+                mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipient)
+                mail.attach(filename=document_name, content=document.document_file.file.read())
+                mail.send()
         return HttpResponseRedirect(reverse('mail-success'))
 
-    return render_to_response('iSM/mail_documentos.html', {'consorcio': consorcio},
-        context_instance=RequestContext(request))
+    return render_to_response('iSM/mail_documentos.html', context_instance=RequestContext(request))
 
 @login_required
 def upload(request):
     if request.method == 'POST':
         document_form = DocumentUploadForm(request.POST, request.FILES)
         if document_form.is_valid():
-            _ = document_form.save()
-            return HttpResponseRedirect(reverse('upload'))
+            document = document_form.save(commit=False)
+            try:
+                processed = process_document(document.document_file.file)
+                consorcista, belongs_to = processed
+                document.consorcista = consorcista
+                document.document_name = document.document_file.name
+                document.belongs_to = belongs_to
+                document.save()
+                return HttpResponseRedirect(reverse('upload'))
+            except:
+                document_form._errors['document_file'] = u'\nDocumento inv&aacute;lido'
     else:
         document_form = DocumentUploadForm()
     return render_to_response('iSM/upload.html', {'upload_form': document_form},
@@ -169,13 +177,20 @@ def get_documents(request):
     if request.is_ajax():
         if request.method == 'GET':
             consorcio_id = request.GET.get('consorcio_id')
+            consorcista_id = request.GET.get('consorcista_id')
             date = request.GET.get('date')
-            if not re.match(r'(\d+){2}\/(\d+){4}', date):
-                return HttpResponseBadRequest
-            date_split = date.split('/')
-            date = '%s-%s-01' % (date_split[1], date_split[0])
+            documents_list = Documento.objects.all()
             if consorcio_id:
-                documents_list = Documento.objects.filter(consorcio=consorcio_id, belongs_to=date)
-                return render_to_response('iSM/lista_documentos.html', {'documents_list': documents_list,
-                                                                        'consorcio_id': consorcio_id},
-                    context_instance=RequestContext(request))
+                documents_list = documents_list.filter(consorcista__consorcio=consorcio_id)
+            if consorcista_id:
+                documents_list = documents_list.filter(consorcista=consorcista_id)
+            if date:
+                if not re.match(r'(\d+){2}\/(\d+){4}', date):
+                    return HttpResponseBadRequest
+                date_split = date.split('/')
+                date = '%s-%s-01' % (date_split[1], date_split[0])
+                documents_list = documents_list.filter(belongs_to=date)
+            return render_to_response('iSM/lista_documentos.html', {'documents_list': documents_list},
+                                        context_instance=RequestContext(request))
+    else:
+        return HttpResponseBadRequest

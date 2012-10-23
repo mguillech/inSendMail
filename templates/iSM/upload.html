@@ -2,21 +2,10 @@
 {% block extra_js %}
 <script type="text/javascript">
     function checkForm() {
-        var consorcio_field = $('#id_consorcio');
-        var re_upload = /\d+_.+.pdf/;
-        var re_belongs_to = /(\d+){2}\/(\d+){4}/;
-        var file_field = $('#id_document_file');
-        var belongs_to_field = $('#id_belongs_to');
-        if (consorcio_field.val() == '') {
-            alert("Por favor seleccione un consorcio en la lista");
-            return false;
-        }
+        file_field = $('#document_file');
+        var re_upload = /.+\.pdf/;
         if (!re_upload.test(file_field.val().split('\\')[2])) {
             alert("Por favor seleccione un archivo de consorcio válido");
-            return false;
-        }
-        if (!re_belongs_to.test(belongs_to_field.val())) {
-            alert('Por favor seleccione un mes/año válido');
             return false;
         }
         return true;

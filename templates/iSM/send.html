@@ -12,23 +12,30 @@
 <script type="text/javascript">
     function popularDocumentos() {
         var consorcio_id = $('#consorcio_list').val();
+        var consorcista_id = $('#consorcista_list').val();
         var datepicker_date = $('#date_selection').val();
-        if (consorcio_id && datepicker_date) {
-            $.get("{% url get-documents %}", { consorcio_id: consorcio_id, date: datepicker_date },
-                    function(response) {
-                        $('#documents').html(response);
-                    }
-            );
-        }
-        else
-            $('#documents').empty();
+        $.ajax({
+            url: "{% url get-documents %}",
+            data: {consorcio_id: consorcio_id, consorcista_id: consorcista_id, date: datepicker_date},
+            beforeSend: function(xhr) {
+                $('#documents').html('<img src="{{ STATIC_URL }}images/ajax-loader.gif"/>');
+            },
+            success: function(response) {
+                $('#documents').html(response);
+            }
+        })
     }
+
+    $().ready(function() {
+        popularDocumentos();
+    });
 </script>
 {% endblock %}
 {% block content %}
 <div class="section">
     <fieldset>
-    <legend>Seleccione consorcio</legend>
+    <legend>Filtros</legend>
+    <legend>Consorcio</legend>
     {% if consorcio_list %}
         <select class="styled_select" size="1" id="consorcio_list" name="consorcio" onchange="popularDocumentos();">
             <option></option>
@@ -40,8 +47,20 @@
         <p> No hay consorcios. </p>
     {% endif %}
     <br/><br/>
+        <legend>Consorcista</legend>
+        {% if consorcista_list %}
+            <select class="styled_select" size="1" id="consorcista_list" name="consorcista" onchange="popularDocumentos();">
+                <option></option>
+                {% for consorcista in consorcista_list %}
+                    <option value={{ consorcista.id }}>{{ consorcista.name }}</option>
+                {% endfor %}
+            </select>
+        {% else %}
+            <p> No hay consorcistas. </p>
+        {% endif %}
+        <br/><br/>
     <legend>Seleccione mes/a&ntilde;o</legend>
-    <input id="date_selection" class="datefield" />
+    <input id="date_selection" class="datefield" onchange="popularDocumentos();"/>
     <br/><br/>
     <div id="documents">
     </div>

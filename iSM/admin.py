@@ -10,7 +10,7 @@ class ConsorcioAdmin(admin.ModelAdmin):
     inlines = [ConsorcistaInline]
 
 class ConsorcistaAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'consorcio')
+    list_display = ('name', 'emails', 'consorcio')
     search_fields = ['name']
     list_filter = ['consorcio']
 

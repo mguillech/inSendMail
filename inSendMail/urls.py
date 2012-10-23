@@ -24,6 +24,7 @@ urlpatterns = patterns('',
     url(r'^about/$', 'iSM.views.about', name='about'),
     url(r'^contact_us/$', 'iSM.views.contact_us', name='contact-us'),
     url(r'^consorcio/', include('iSM.urls')),
-    url(r'^mail_documents/(\d*)$', 'iSM.views.mail_documents', name='mail-documents'),
+    url(r'^mail_documents/$', 'iSM.views.mail_documents', name='mail-documents'),
     url(r'^mail_sucess/$', direct_to_template, {'template': 'iSM/mail_success.html'}, name='mail-success'),
+    url(r'^mail_failed/$', direct_to_template, {'template': 'iSM/mail_failed.html'}, name='mail-failed'),
 )
