@@ -81,6 +81,8 @@ body {
 	margin: 0;
 	padding-left: 10px;
 	min-width: 960px;
+    overflow-y: auto;
+    height: 400px;
 }
 
 #body .header {
@@ -189,7 +191,7 @@ body {
 	margin: 0 auto;
 	overflow: hidden;
 	padding: 0 0 15px 0;
-	width: 960px;	
+	width: 960px;
 }
 #body .footer div {
 	float: left;	
@@ -564,12 +566,15 @@ body {
 	width:100%;
 	padding: 0;
     min-width: 960px;
+    position: absolute;
+    bottom: 0;
+    height: 50px;
 }
 
 #footer div {
 	margin: 0 auto;
 	overflow: hidden;
-	padding: 26px 0 0;	
+	padding: 7px 0 0;
 	width: 960px;
 }
 #footer div div {
