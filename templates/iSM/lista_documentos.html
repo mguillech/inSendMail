@@ -24,6 +24,7 @@
 </table>
 <br/>
 <button id="send_email">Enviar documentos</button>
+<button id="delete_documents">Eliminar documentos</button>
 {% else %}
     <p>No hay documentos que coincidan con su b&uacute;squeda.</p>
 {% endif %}
@@ -51,19 +52,46 @@
         return false;
     });
 
+    $('#delete_documents').click(function() {
+        var checked_documents = $('input[type=checkbox]:checked').not('#master_checkbox');
+        if (checked_documents.length == 0) {
+            alert('Debe seleccionar al menos un documento para eliminar');
+            return false;
+        }
+
+        if (confirm('Está seguro de que desea eliminar los documentos seleccionados?')) {
+            var document_elems = checked_documents.parent().parent().find('span');
+            document_pks = [];
+            document_elems.each(function(index) {
+                var elem = $(this);
+                document_pks.push(elem.attr("id"));
+            });
+            $.ajax({
+                url: '{% url delete-documents %}',
+                type: 'POST',
+                data: {document_pks: document_pks.join(), csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function(response) {
+                    window.location.href = '{% url home %}';
+                }
+            });
+        }
+    });
+
     function checkSelected(master_checkbox) {
+        var input_checkbox = $('input[type=checkbox]');
         if (master_checkbox.checked)
-            $('input[type=checkbox]').attr('checked', 'checked');
+            input_checkbox.attr('checked', 'checked');
         else
-            $('input[type=checkbox]').removeAttr('checked');
+            input_checkbox.removeAttr('checked');
     }
 
     function checkMaster() {
+        var master_checkbox = $('#master_checkbox');
         var all_checks = $('input[type=checkbox]').not('#master_checkbox');
         var checked_documents = $('input[type=checkbox]:checked').not('#master_checkbox');
         if (all_checks.length == checked_documents.length)
-            $('#master_checkbox').attr('checked', 'checked');
+            master_checkbox.attr('checked', 'checked');
         else
-            $('#master_checkbox').removeAttr('checked');
+            master_checkbox.removeAttr('checked');
     }
 </script>

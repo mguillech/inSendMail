@@ -82,7 +82,7 @@ body {
 	padding-left: 10px;
 	min-width: 960px;
     overflow-y: auto;
-    height: 400px;
+    // height: 450px;
 }
 
 #body .header {
@@ -568,13 +568,13 @@ body {
     min-width: 960px;
     position: absolute;
     bottom: 0;
-    height: 50px;
+    height: 15px;
 }
 
 #footer div {
 	margin: 0 auto;
 	overflow: hidden;
-	padding: 7px 0 0;
+	// padding: 7px 0 0;
 	width: 960px;
 }
 #footer div div {
@@ -628,7 +628,7 @@ body {
 	color: #c1c1c1;
 	font-size: 12px;
 	margin: 0;
-	padding: 0 0 30px 0;
+	// padding: 0 0 30px 0;
 	text-align: center;	
 	text-shadow: 1px 1px 1px #fff;
 }

@@ -12,6 +12,7 @@ from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedire
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from django.conf import settings
+from django.utils import simplejson as json
 from iSM.models import Consorcio, Consorcista, Documento
 from iSM.forms import ConsorcioForm, ConsorcistaForm, DocumentUploadForm, ContactUs
 
@@ -194,3 +195,18 @@ def get_documents(request):
                                         context_instance=RequestContext(request))
     else:
         return HttpResponseBadRequest
+
+@login_required
+def delete_documents(request):
+    if request.is_ajax():
+        documents_pks = request.POST.get('document_pks')
+        if not documents_pks:
+            return HttpResponseBadRequest()
+        documents = Documento.objects.filter(pk__in=documents_pks.split(','))
+        if documents:
+            documents.delete()
+            return HttpResponse(json.dumps({'status': True}))
+        else:
+            return HttpResponse(json.dumps({'status': False}))
+    else:
+        return HttpResponseBadRequest()
