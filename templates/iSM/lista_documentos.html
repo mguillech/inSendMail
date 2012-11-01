@@ -7,6 +7,7 @@
         <th>Consorcio</th>
         <th>Consorcista</th>
         <th>Documento</th>
+        <th>Corresponde</th>
         <th>Fecha de creaci&oacute;n</th>
     </tr>
 </thead>
@@ -17,6 +18,7 @@
         <td>{{ document.consorcista.consorcio }}</td>
         <td>{{ document.consorcista }}</td>
         <td><span id="{{ document.pk }}" class="document_name"><img src='{{ STATIC_URL }}images/pdf-icon.png' />{{ document.document_file|basename }}</span></td>
+        <td>{{ document.belongs_to|date:"m/Y" }}</td>
         <td>{{ document.created|date:"d/m/Y H:m:s" }}</td>
     </tr>
 {% endfor %}

@@ -83,7 +83,7 @@ body {
 	min-width: 960px;
     overflow-y: auto;
     overflow-x: hidden;
-    // height: 450px;
+    height: 450px;
 }
 
 #body .header {
