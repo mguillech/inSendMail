@@ -23,5 +23,9 @@
                 <input type="submit" value="Subir archivo" onclick="return checkForm();"/>
             </fieldset>
         </form>
+        {% if uploaded %}
+            <br/>
+            <p style="color:blue;">Su documento ha sido subido exit&oacute;samente!</p>
+        {% endif %}
     </div>
 {% endblock %}

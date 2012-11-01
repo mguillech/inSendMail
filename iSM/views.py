@@ -83,12 +83,13 @@ def upload(request):
                 document.document_name = document.document_file.name
                 document.belongs_to = belongs_to
                 document.save()
-                return HttpResponseRedirect(reverse('upload'))
+                return HttpResponseRedirect(reverse('upload') + '?uploaded=true')
             except:
                 document_form._errors['document_file'] = u'\nDocumento inv&aacute;lido'
     else:
         document_form = DocumentUploadForm()
-    return render_to_response('iSM/upload.html', {'upload_form': document_form},
+    return render_to_response('iSM/upload.html', {'upload_form': document_form,
+                                                  'uploaded': bool(request.GET.get('uploaded', False))},
         context_instance=RequestContext(request))
 
 @login_required
