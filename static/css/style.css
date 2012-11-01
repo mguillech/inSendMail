@@ -82,6 +82,7 @@ body {
 	padding-left: 10px;
 	min-width: 960px;
     overflow-y: auto;
+    overflow-x: hidden;
     // height: 450px;
 }
 
