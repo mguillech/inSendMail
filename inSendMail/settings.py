@@ -171,11 +171,11 @@ LOGGING = {
     }
 }
 
-# Configuracion para el correo
+# Mail configuration
 EMAIL_HOST = 'your_smtp_host'
 EMAIL_HOST_USER = 'your_smtp_user'
 EMAIL_HOST_PASSWORD = 'your_smtp_password'
-EMAIL_PORT = 587
+EMAIL_PORT = 25
 EMAIL_USE_TLS = True
 
 # Authentication

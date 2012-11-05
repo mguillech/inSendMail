@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+from django.utils.datastructures import MultiValueDict
 import os
 import re
 from django.core.urlresolvers import reverse
@@ -73,19 +74,26 @@ def mail_documents(request):
 @login_required
 def upload(request):
     if request.method == 'POST':
-        document_form = DocumentUploadForm(request.POST, request.FILES)
-        if document_form.is_valid():
-            document = document_form.save(commit=False)
-            try:
-                processed = process_document(document.document_file.file)
-                consorcista, belongs_to = processed
-                document.consorcista = consorcista
-                document.document_name = document.document_file.name
-                document.belongs_to = belongs_to
-                document.save()
-                return HttpResponseRedirect(reverse('upload') + '?uploaded=true')
-            except:
-                document_form._errors['document_file'] = u'\nDocumento inv&aacute;lido'
+        docs = request.FILES.getlist('document_file')
+        errors = False
+        for doc in docs:
+            document_form = DocumentUploadForm(request.POST, MultiValueDict({'document_file': [doc]}))
+            if document_form.is_valid():
+                document = document_form.save(commit=False)
+                try:
+                    processed = process_document(document.document_file.file)
+                    consorcista, belongs_to = processed
+                    document.consorcista = consorcista
+                    document.document_name = document.document_file.name
+                    document.belongs_to = belongs_to
+                    document.save()
+                except:
+                    errors = True
+                    del document
+        if not errors:
+            return HttpResponseRedirect(reverse('upload') + '?uploaded=true')
+        else:
+            document_form._errors['document_file'] = u'\nAl menos un documento subido es inválido'
     else:
         document_form = DocumentUploadForm()
     return render_to_response('iSM/upload.html', {'upload_form': document_form,
@@ -211,3 +219,15 @@ def delete_documents(request):
             return HttpResponse(json.dumps({'status': False}))
     else:
         return HttpResponseBadRequest()
+
+@login_required
+def download_document(request, document_pk):
+    document = get_object_or_404(Documento, pk=document_pk)
+    document_contents = document.document_file.file.read()
+    content_type = 'application/pdf'
+    content_length = document.document_file.file.tell()
+    response = HttpResponse(document_contents, mimetype=content_type)
+    response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(
+        document.document_file.name)
+    response['Content-Length'] = content_length
+    return response

@@ -19,13 +19,16 @@
             <fieldset>
                 <legend>Subir archivo</legend>
                 {{ upload_form.errors }}
-                {{ upload_form.as_p }}
+                <p>
+                    <label for="id_document_file">Archivo de consorcio:</label>
+                    <input type="file" name="document_file" id="id_document_file" multiple />
+                </p>
                 <input type="submit" value="Subir archivo" onclick="return checkForm();"/>
             </fieldset>
         </form>
         {% if uploaded %}
             <br/>
-            <p style="color:blue;">Su documento ha sido subido exitosamente!</p>
+            <p style="color:blue;">Sus documentos han sido subidos exitosamente!</p>
         {% endif %}
     </div>
 {% endblock %}
