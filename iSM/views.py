@@ -63,10 +63,9 @@ def mail_documents(request):
         for document in documents:
             document_name = document.document_name
             recipients = [ i.strip() for i in document.consorcista.emails.split('/') ]
-            for recipient in recipients:
-                mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipient)
-                mail.attach(filename=document_name, content=document.document_file.file.read())
-                mail.send()
+            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipients)
+            mail.attach(filename=document_name, content=document.document_file.file.read())
+            mail.send()
         return HttpResponseRedirect(reverse('mail-success'))
 
     return render_to_response('iSM/mail_documentos.html', context_instance=RequestContext(request))
