@@ -56,7 +56,7 @@ def logout(request):
 def mail_documents(request):
     if request.method == 'POST':
         redirect_to = reverse('mail_success')
-        mail_failed_url = reverse('mail_success')
+        mail_failed_url = reverse('mail_failed')
         subject = request.POST.get('subject')
         message = request.POST.get('message_area')
         documents_pks = request.POST.get('document_pks')

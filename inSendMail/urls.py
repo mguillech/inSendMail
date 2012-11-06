@@ -28,6 +28,6 @@ urlpatterns = patterns('',
     url(r'^delete-documents/$', 'iSM.views.delete_documents', name='delete-documents'),
     url(r'download-document/(\d+)/$', 'iSM.views.download_document', name='download-document'),
     url(r'^mail_documents/$', 'iSM.views.mail_documents', name='mail-documents'),
-    url(r'^mail_sucess/$', direct_to_template, {'template': 'iSM/mail_success.html'}, name='mail-success'),
+    url(r'^mail_success/$', direct_to_template, {'template': 'iSM/mail_success.html'}, name='mail-success'),
     url(r'^mail_failed/$', direct_to_template, {'template': 'iSM/mail_failed.html'}, name='mail-failed'),
 )
