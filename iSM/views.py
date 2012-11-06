@@ -73,7 +73,7 @@ def mail_documents(request):
             try:
                 mail.send()
             except Exception, e:
-                redirect_to = mail_failed_url + '?%s' % urlencode({'error': e.message})
+                redirect_to = mail_failed_url + '?%s' % urlencode({'error': str(e.message)})
                 break
         return HttpResponseRedirect(redirect_to)
 
