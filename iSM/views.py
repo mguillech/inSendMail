@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 from django.utils.datastructures import MultiValueDict
+from django.utils.http import urlencode
 import os
 import re
 from django.core.urlresolvers import reverse
@@ -54,19 +55,27 @@ def logout(request):
 @login_required
 def mail_documents(request):
     if request.method == 'POST':
+        redirect_to = reverse('mail_success')
+        mail_failed_url = reverse('mail_success')
         subject = request.POST.get('subject')
         message = request.POST.get('message_area')
         documents_pks = request.POST.get('document_pks')
         if not all([subject, message, documents_pks]):
-            return HttpResponseRedirect(reverse('mail-failed'))
+            return HttpResponseRedirect(
+                mail_failed_url + '?%s' % urlencode({'error': 'No se llenaron todos los campos'}))
         documents = Documento.objects.filter(pk__in=documents_pks.split(','))
         for document in documents:
             document_name = document.document_name
             recipients = [ i.strip() for i in document.consorcista.emails.split('/') ]
-            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipients)
+            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER,
+                recipients + [settings.EMAIL_HOST_USER])
             mail.attach(filename=document_name, content=document.document_file.file.read())
-            mail.send()
-        return HttpResponseRedirect(reverse('mail-success'))
+            try:
+                mail.send()
+            except Exception, e:
+                redirect_to = mail_failed_url + '?%s' % urlencode({'error': e.message})
+                break
+        return HttpResponseRedirect(redirect_to)
 
     return render_to_response('iSM/mail_documentos.html', context_instance=RequestContext(request))
 
