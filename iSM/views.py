@@ -67,8 +67,7 @@ def mail_documents(request):
         for document in documents:
             document_name = document.document_name
             recipients = [ i.strip() for i in document.consorcista.emails.split('/') ]
-            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER,
-                recipients + [settings.EMAIL_HOST_USER])
+            mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipients + [settings.EMAIL_HOST_USER])
             mail.attach(filename=document_name, content=document.document_file.file.read())
             try:
                 mail.send()

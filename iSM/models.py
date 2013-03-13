@@ -16,7 +16,7 @@ class Consorcio(models.Model):
 class Consorcista(models.Model):
     unidad = models.CharField(max_length=200)
     name = models.CharField(max_length=200)
-    emails = models.CharField(max_length=200)
+    emails = models.CharField(max_length=200, null=True)
     consorcio = models.ForeignKey(Consorcio, related_name='consorcistas')
     created = models.DateField(auto_now_add=True)
 

@@ -95,13 +95,8 @@ def process_document(document):
 
     consorcio = Consorcio.objects.get_or_create(name=consorcio_name_full)[0]
 
-    consorcista = Consorcista.objects.filter(Q(emails__in=emails) | Q(emails='/'.join(emails)),
-        name=consorcista_name)
-    if not consorcista:
-        consorcista = Consorcista.objects.create(unidad=unidad, name=consorcista_name,
-            emails='/'.join(emails), consorcio=consorcio)
-        consorcista.save()
-    else:
-        consorcista = consorcista.get()
+    consorcista = Consorcista.objects.get_or_create(unidad=unidad, name=consorcista_name, consorcio=consorcio)[0]
+    consorcista.emails = '/'.join(emails)
+    consorcista.save()
 
     return consorcista, _format_date(belongs_to)
