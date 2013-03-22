@@ -36,3 +36,12 @@ class Documento(models.Model):
 
     def __unicode__(self):
         return u'%s' % self.document_name
+
+
+class Comun(models.Model):
+    common_name = models.CharField(max_length=255, null=True, blank=True)
+    common_file = models.FileField(upload_to='commons/%Y/%m/%d/%H/%M/%S/', max_length=255)
+    created = models.DateTimeField(auto_now_add=True)
+
+    def __unicode__(self):
+        return u'%s' % self.common_name

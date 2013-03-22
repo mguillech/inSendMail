@@ -33,6 +33,15 @@
         });
         $('#document_pks').attr("value", document_pks.join(','));
         $('#message_area').elastic();
+
+        $('.common_file').on('click', function(e) {
+            var common_pks = [];
+            common_checked = $('.common_file:checked');
+            for(i=0; i < common_checked.length; i++ ) {
+                common_pks.push($(common_checked[i]).closest('tr').find('span').attr('id'));
+            }
+            $('#common_pks').attr("value", common_pks.join(','));
+        });
     });
 
     function checkMessage() {
@@ -50,11 +59,20 @@
 <form action="" method="POST">
     {% csrf_token %}
     <input type="hidden" id="document_pks" name="document_pks"/>
+    <input type="hidden" id="common_pks" name="common_pks"/>
     <label for="subject" id="subject_label">Asunto del correo:</label>
     <input type="text" id="subject" name="subject" />
     <br/></br>
     <label for="message_area" id="message_label">Mensaje en el correo:</label>
     <textarea id="message_area" name="message_area"></textarea>
     <br/><br/>
+    <legend>Incluir archivos comunes:</legend>
+    <table>
+    {% for common_file in common_files %}
+        <tr>
+            <td><input type='checkbox' class='common_file' /></td><td><span id="{{ common_file.pk }}">{{ common_file }}</span></td>
+        </tr>
+    {% endfor %}
+    </table>
     <input type="submit" value="Enviar correo" onclick="return checkMessage();"/>
 </form>

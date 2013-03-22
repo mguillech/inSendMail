@@ -17,13 +17,18 @@
         <form id="upload_form" action="{% url upload %}" method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <fieldset>
-                <legend>Subir archivo</legend>
-                {{ upload_form.errors }}
+                <legend>Subir archivo/s</legend>
+                {{ document_form.errors }}
                 <p>
                     <label for="id_document_file">Archivo de consorcio:</label>
                     <input type="file" name="document_file" id="id_document_file" multiple />
                 </p>
-                <input type="submit" value="Subir archivo" onclick="return checkForm();"/>
+                {{ common_form.errors }}
+                <p>
+                    <label for="id_common_file">Archivo com&uacute;n:</label>
+                    <input type="file" name="common_file" id="id_common_file" multiple />
+                </p>
+                <input type="submit" value="Subir archivo/s" onclick="return checkForm();"/>
             </fieldset>
         </form>
         {% if uploaded %}

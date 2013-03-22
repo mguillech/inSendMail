@@ -15,8 +15,8 @@ from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from django.utils import simplejson as json
-from iSM.models import Consorcio, Consorcista, Documento
-from iSM.forms import ConsorcioForm, ConsorcistaForm, DocumentUploadForm, ContactUs
+from iSM.models import Consorcio, Consorcista, Documento, Comun
+from iSM.forms import ConsorcioForm, ConsorcistaForm, DocumentUploadForm, CommonUploadForm, ContactUs
 
 from iSM.functions import process_document
 
@@ -60,15 +60,21 @@ def mail_documents(request):
         subject = request.POST.get('subject')
         message = request.POST.get('message_area')
         documents_pks = request.POST.get('document_pks')
+        common_pks = request.POST.get('common_pks')
         if not all([subject, message, documents_pks]):
             return HttpResponseRedirect(
                 mail_failed_url + '?%s' % urlencode({'error': 'No se llenaron todos los campos'}))
         documents = Documento.objects.filter(pk__in=documents_pks.split(','))
+        commons = []
+        if common_pks:
+            commons = Comun.objects.filter(pk__in=common_pks.split(','))
         for document in documents:
             document_name = document.document_name
             recipients = [ i.strip() for i in document.consorcista.emails.split('/') ]
             mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipients + [settings.EMAIL_HOST_USER])
             mail.attach(filename=document_name, content=document.document_file.file.read())
+            for common in commons:
+                mail.attach(filename=common.common_name, content=common.common_file.file.read())
             try:
                 mail.send()
             except Exception, e:
@@ -76,12 +82,15 @@ def mail_documents(request):
                 break
         return HttpResponseRedirect(redirect_to)
 
-    return render_to_response('iSM/mail_documentos.html', context_instance=RequestContext(request))
+    common_files = Comun.objects.all()
+    return render_to_response('iSM/mail_documentos.html', {'common_files': common_files},
+                              context_instance=RequestContext(request))
 
 @login_required
 def upload(request):
     if request.method == 'POST':
         docs = request.FILES.getlist('document_file')
+        commons = request.FILES.getlist('common_file')
         errors = False
         for doc in docs:
             document_form = DocumentUploadForm(request.POST, MultiValueDict({'document_file': [doc]}))
@@ -97,13 +106,20 @@ def upload(request):
                 except:
                     errors = True
                     del document
+        for common in commons:
+            common_form = CommonUploadForm(request.POST, MultiValueDict({'common_file': [common]}))
+            if common_form.is_valid():
+                common_file = common_form.save(commit=False)
+                common_file.common_name = common.name
+                common_file.save()
         if not errors:
             return HttpResponseRedirect(reverse('upload') + '?uploaded=true')
         else:
             document_form._errors['document_file'] = u'\nAl menos un documento subido es inválido'
     else:
         document_form = DocumentUploadForm()
-    return render_to_response('iSM/upload.html', {'upload_form': document_form,
+        common_form = CommonUploadForm()
+    return render_to_response('iSM/upload.html', {'document_form': document_form, 'common_form': common_form,
                                                   'uploaded': bool(request.GET.get('uploaded', False))},
         context_instance=RequestContext(request))
 

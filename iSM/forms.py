@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import re
 from django import forms
-from iSM.models import Consorcio, Consorcista, Documento
+from iSM.models import Consorcio, Consorcista, Documento, Comun
 
 
 class ConsorcioForm(forms.ModelForm):
@@ -35,9 +35,26 @@ class DocumentUploadForm(forms.ModelForm):
 
         return data
 
+
     class Meta:
         model = Documento
         fields = ('document_file',)
+
+
+class CommonUploadForm(forms.ModelForm):
+    common_file = forms.FileField(label=u'Archivo común')
+
+    def clean_common_file(self):
+        data = self.cleaned_data['common_file']
+
+        if Comun.objects.filter(common_name=data.name):
+            raise forms.ValidationError(u'Archivo ya existente en la base de datos')
+
+        return data
+
+    class Meta:
+        model = Comun
+        fields = ('common_file',)
 
 
 class ContactUs(forms.Form):
