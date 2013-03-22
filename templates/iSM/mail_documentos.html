@@ -72,6 +72,8 @@
         <tr>
             <td><input type='checkbox' class='common_file' /></td><td><span id="{{ common_file.pk }}">{{ common_file }}</span></td>
         </tr>
+    {% empty %}
+        No hay archivos comunes para incluir.
     {% endfor %}
     </table>
     <input type="submit" value="Enviar correo" onclick="return checkMessage();"/>
