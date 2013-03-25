@@ -88,6 +88,8 @@ def mail_documents(request):
 
 @login_required
 def upload(request):
+    document_form = DocumentUploadForm()
+    common_form = CommonUploadForm()
     if request.method == 'POST':
         docs = request.FILES.getlist('document_file')
         commons = request.FILES.getlist('common_file')
@@ -116,9 +118,6 @@ def upload(request):
             return HttpResponseRedirect(reverse('upload') + '?uploaded=true')
         else:
             document_form._errors['document_file'] = u'\nAl menos un documento subido es inválido'
-    else:
-        document_form = DocumentUploadForm()
-        common_form = CommonUploadForm()
     return render_to_response('iSM/upload.html', {'document_form': document_form, 'common_form': common_form,
                                                   'uploaded': bool(request.GET.get('uploaded', False))},
         context_instance=RequestContext(request))
