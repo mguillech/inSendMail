@@ -67,14 +67,15 @@ def mail_documents(request):
         documents = Documento.objects.filter(pk__in=documents_pks.split(','))
         commons = []
         if common_pks:
-            commons = Comun.objects.filter(pk__in=common_pks.split(','))
+            commons = [(common.common_name, common.common_file.file.read())
+                       for common in Comun.objects.filter(pk__in=common_pks.split(','))]
         for document in documents:
             document_name = document.document_name
-            recipients = [ i.strip() for i in document.consorcista.emails.split('/') ]
+            recipients = [i.strip() for i in document.consorcista.emails.split('/')]
             mail = EmailMessage(subject, message, settings.EMAIL_HOST_USER, recipients + [settings.EMAIL_HOST_USER])
             mail.attach(filename=document_name, content=document.document_file.file.read())
-            for common in commons:
-                mail.attach(filename=common.common_name, content=common.common_file.file.read())
+            for common_name, common_content in commons:
+                mail.attach(filename=common_name, content=common_content)
             try:
                 mail.send()
             except Exception, e:
